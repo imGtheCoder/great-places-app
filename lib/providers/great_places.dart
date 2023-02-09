@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../models/place.dart';
 import '../helpers/db_helper.dart';
+import '../helpers/location_helper.dart';
 
 class GreatPlaces with ChangeNotifier {
   List<Place> _items = [];
@@ -12,12 +13,20 @@ class GreatPlaces with ChangeNotifier {
     return [..._items];
   }
 
-  void addPlace(String pickedTitle, File pickedImage) {
+  Future<void> addPlace(String pickedTitle, File pickedImage,
+      PlaceLocation pickedLocation) async {
+    final adress = await LocationHelper.getPlaceAdress(
+        pickedLocation.latitude, pickedLocation.longitute);
+    final updatedLocation = PlaceLocation(
+      latitude: pickedLocation.latitude,
+      longitute: pickedLocation.longitute,
+      addres: adress,
+    );
     final newPlace = Place(
       id: DateTime.now().toString(),
       image: pickedImage,
       title: pickedTitle,
-      location: null,
+      location: updatedLocation,
     );
     _items.add(newPlace);
     notifyListeners();
@@ -39,6 +48,6 @@ class GreatPlaces with ChangeNotifier {
               location: null,
             ))
         .toList();
-        notifyListeners();
+    notifyListeners();
   }
 }
